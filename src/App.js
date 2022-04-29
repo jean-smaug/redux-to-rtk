@@ -1,23 +1,37 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import "./App.css";
+import { fetchPosts } from "./modules/posts.slice";
 
 function App() {
+  const dispatch = useDispatch();
+  const posts = useSelector((state) => state.posts.posts);
+  const status = useSelector((state) => state.posts.status);
+
+  // useEffect(() => {
+  //   dispatch(fetchPosts());
+  // }, []);
+
+  if (status === "pending") {
+    return "Chargement...";
+  }
+
+  if (status === "error") {
+    return "Ouups..";
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <button
+        onClick={() => {
+          dispatch(fetchPosts());
+        }}
+      >
+        Click
+      </button>
+      {posts.map((post) => (
+        <div>{post.title}</div>
+      ))}
     </div>
   );
 }
