@@ -1,3 +1,4 @@
+import { serializeError } from "serialize-error";
 import { wait } from "../utils";
 
 /**
@@ -31,7 +32,7 @@ const fetchPostsSucceed = (posts) => ({
 
 const fetchPostsError = (error) => ({
   type: FETCH_POSTS_ERROR,
-  error: error,
+  error: serializeError(error),
 });
 
 /**
