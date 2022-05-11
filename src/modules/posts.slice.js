@@ -89,8 +89,15 @@ export const reducer = (state = initialState, action) => {
 /**
  * SELECTORS
  */
-export const selectAllPostsAsArray = (state) => {
-  const { posts } = state;
+const selectAllAsArray = (state) => {
+  return Object.values(state.posts.entities);
+};
 
-  return Object.values(posts.entities);
+const selectStatus = (state) => {
+  return state.posts.status;
+};
+
+export const postsSelectors = {
+  selectAllAsArray,
+  selectStatus,
 };
