@@ -1,45 +1,96 @@
-import { createAsyncThunk, createReducer } from "@reduxjs/toolkit";
-
 import { wait } from "../utils";
 
+/**
+ * INITIAL STATE
+ */
 const initialState = {
-  status: "idle",
-  posts: [],
+  status: "idle", // "idle" | "pending" | "succeed" | "error"
+  ids: [],
+  entities: {},
   error: null,
 };
 
-// Action async = thunk
-export const fetchPosts = createAsyncThunk(
-  "posts/fetchPosts",
-  async () => {
+/**
+ * ACTION TYPE
+ */
+const FETCH_POSTS_PENDING = "posts/FETCH_POSTS_PENDING";
+const FETCH_POSTS_SUCCEED = "posts/FETCH_POSTS_SUCCEED";
+const FETCH_POSTS_ERROR = "posts/FETCH_POSTS_ERROR";
+
+/**
+ * ACTION CREATOR
+ */
+const fetchPostsPending = () => ({
+  type: FETCH_POSTS_PENDING,
+});
+
+const fetchPostsSucceed = (posts) => ({
+  type: FETCH_POSTS_SUCCEED,
+  payload: posts,
+});
+
+const fetchPostsError = (error) => ({
+  type: FETCH_POSTS_ERROR,
+  error: error,
+});
+
+/**
+ * THUNKS
+ */
+export const fetchPosts = () => async (dispatch) => {
+  dispatch(fetchPostsPending());
+
+  try {
     const response = await fetch("http://jsonplaceholder.typicode.com/posts");
     const posts = await response.json();
 
     await wait();
 
-    return posts;
-  },
-  {
-    condition: (_arg, api) => {
-      const state = api.getState();
-
-      return state.posts.status === "idle";
-    },
+    dispatch(fetchPostsSucceed(posts));
+  } catch (error) {
+    dispatch(fetchPostsError(error));
   }
-);
+};
 
-export const reducer = createReducer(initialState, (builder) => {
-  builder.addCase(fetchPosts.pending.type, (state) => {
-    state.status = "pending";
-  });
+/**
+ * REDUCER
+ */
+export const reducer = (state = initialState, action) => {
+  switch (action.type) {
+    case FETCH_POSTS_PENDING: {
+      return { ...state, status: "pending" };
+    }
 
-  builder.addCase(fetchPosts.fulfilled.type, (state, action) => {
-    state.posts = action.payload;
-    state.status = "success";
-  });
+    case FETCH_POSTS_SUCCEED: {
+      const postsIds = action.payload.map((post) => post.id);
+      const postsEntities = action.payload.reduce(
+        (acc, post) => ({ ...acc, [post.id]: post }),
+        {}
+      );
 
-  builder.addCase(fetchPosts.rejected.type, (state, action) => {
-    state.error = action.error;
-    state.status = "error";
-  });
-});
+      return {
+        ...state,
+        status: "succeed",
+        ids: postsIds,
+        entities: postsEntities,
+      };
+    }
+
+    case FETCH_POSTS_ERROR: {
+      return { ...state, status: "error", error: action.error };
+    }
+
+    default: {
+      return state;
+    }
+  }
+};
+
+/**
+ * SELECTORS
+ */
+export const selectAllPostsAsArray = (state) => {
+  const { posts } = state;
+
+  return Object.values(posts.entities);
+};
