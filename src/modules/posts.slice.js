@@ -1,91 +1,55 @@
-import { serializeError } from "serialize-error";
+import {
+  createAsyncThunk,
+  createReducer,
+  createEntityAdapter,
+} from "@reduxjs/toolkit";
 import { wait } from "../utils";
+
+/**
+ * ENTITY ADAPTER
+ */
+const postsAdapter = createEntityAdapter();
 
 /**
  * INITIAL STATE
  */
 const initialState = {
   status: "idle", // "idle" | "pending" | "succeed" | "error"
-  ids: [],
-  entities: {},
+  ...postsAdapter.getInitialState(),
   error: null,
 };
 
 /**
- * ACTION TYPE
- */
-const FETCH_POSTS_PENDING = "posts/FETCH_POSTS_PENDING";
-const FETCH_POSTS_SUCCEED = "posts/FETCH_POSTS_SUCCEED";
-const FETCH_POSTS_ERROR = "posts/FETCH_POSTS_ERROR";
-
-/**
- * ACTION CREATOR
- */
-const fetchPostsPending = () => ({
-  type: FETCH_POSTS_PENDING,
-});
-
-const fetchPostsSucceed = (posts) => ({
-  type: FETCH_POSTS_SUCCEED,
-  payload: posts,
-});
-
-const fetchPostsError = (error) => ({
-  type: FETCH_POSTS_ERROR,
-  error: serializeError(error),
-});
-
-/**
  * THUNKS
  */
-export const fetchPosts = () => async (dispatch) => {
-  dispatch(fetchPostsPending());
+export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
+  const response = await fetch("http://jsonplaceholder.typicode.com/posts");
+  const posts = await response.json();
 
-  try {
-    const response = await fetch("http://jsonplaceholder.typicode.com/posts");
-    const posts = await response.json();
+  await wait();
 
-    await wait();
-
-    dispatch(fetchPostsSucceed(posts));
-  } catch (error) {
-    dispatch(fetchPostsError(error));
-  }
-};
+  return posts;
+});
 
 /**
  * REDUCER
  */
-export const reducer = (state = initialState, action) => {
-  switch (action.type) {
-    case FETCH_POSTS_PENDING: {
-      return { ...state, status: "pending" };
-    }
+export const reducer = createReducer(initialState, (builder) => {
+  builder.addCase(fetchPosts.pending.type, (state) => {
+    state.status = "pending";
+  });
 
-    case FETCH_POSTS_SUCCEED: {
-      const postsIds = action.payload.map((post) => post.id);
-      const postsEntities = action.payload.reduce(
-        (acc, post) => ({ ...acc, [post.id]: post }),
-        {}
-      );
+  builder.addCase(fetchPosts.fulfilled.type, (state, action) => {
+    postsAdapter.addMany(state, action.payload);
 
-      return {
-        ...state,
-        status: "succeed",
-        ids: postsIds,
-        entities: postsEntities,
-      };
-    }
+    state.status = "succeed";
+  });
 
-    case FETCH_POSTS_ERROR: {
-      return { ...state, status: "error", error: action.error };
-    }
-
-    default: {
-      return state;
-    }
-  }
-};
+  builder.addCase(fetchPosts.rejected.type, (state, action) => {
+    state.status = "error";
+    state.error = action.error;
+  });
+});
 
 /**
  * SELECTORS
