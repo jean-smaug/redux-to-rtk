@@ -89,8 +89,12 @@ export const reducer = (state = initialState, action) => {
 /**
  * SELECTORS
  */
-const selectAllAsArray = (state) => {
-  return Object.values(state.posts.entities);
+const selectIds = (state) => {
+  return state.posts.ids;
+};
+
+const selectById = (id) => (state) => {
+  return state.posts.entities[id];
 };
 
 const selectStatus = (state) => {
@@ -98,6 +102,7 @@ const selectStatus = (state) => {
 };
 
 export const postsSelectors = {
-  selectAllAsArray,
+  selectIds,
   selectStatus,
+  selectById,
 };

@@ -1,13 +1,17 @@
 import { useDispatch, useSelector } from "react-redux";
+import PostList from "./modules/PostList.component";
 import { fetchPosts, postsSelectors } from "./modules/posts.slice";
 
 function App() {
   const dispatch = useDispatch();
-  const posts = useSelector(postsSelectors.selectAllAsArray);
   const status = useSelector(postsSelectors.selectStatus);
 
   if (status === "error") {
-    return "Ouups..";
+    return (
+      <section>
+        <strong style={{ fontSize: "40px" }}>Ouups..</strong>
+      </section>
+    );
   }
 
   return (
@@ -18,12 +22,10 @@ function App() {
           dispatch(fetchPosts());
         }}
       >
-        Click
+        Click me
       </button>
 
-      {status === "pending"
-        ? "Chargement..."
-        : posts.map((post) => <div key={post.id}>{post.title}</div>)}
+      {status === "pending" ? "Chargement..." : <PostList />}
     </div>
   );
 }
