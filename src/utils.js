@@ -1,4 +1,4 @@
-export function wait(delay = 2000) {
+export function wait(delay = 1500) {
   return new Promise((res) => {
     setTimeout(() => {
       res();

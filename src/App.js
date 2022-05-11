@@ -1,19 +1,10 @@
 import { useDispatch, useSelector } from "react-redux";
-import "./App.css";
-import { fetchPosts } from "./modules/posts.slice";
+import { fetchPosts, postsSelectors } from "./modules/posts.slice";
 
 function App() {
   const dispatch = useDispatch();
-  const posts = useSelector((state) => state.posts.posts);
-  const status = useSelector((state) => state.posts.status);
-
-  // useEffect(() => {
-  //   dispatch(fetchPosts());
-  // }, []);
-
-  if (status === "pending") {
-    return "Chargement...";
-  }
+  const posts = useSelector(postsSelectors.selectAllAsArray);
+  const status = useSelector(postsSelectors.selectStatus);
 
   if (status === "error") {
     return "Ouups..";
@@ -23,14 +14,16 @@ function App() {
     <div>
       <button
         onClick={() => {
+          // TODO: implement prevent refetch
           dispatch(fetchPosts());
         }}
       >
         Click
       </button>
-      {posts.map((post) => (
-        <div>{post.title}</div>
-      ))}
+
+      {status === "pending"
+        ? "Chargement..."
+        : posts.map((post) => <div key={post.id}>{post.title}</div>)}
     </div>
   );
 }
