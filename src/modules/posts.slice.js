@@ -1,55 +1,75 @@
-import {
-  createAsyncThunk,
-  createReducer,
-  createEntityAdapter,
-} from "@reduxjs/toolkit";
 import { wait } from "../utils";
-
-/**
- * ENTITY ADAPTER
- */
-const postsAdapter = createEntityAdapter();
 
 /**
  * INITIAL STATE
  */
 const initialState = {
   status: "idle", // "idle" | "pending" | "succeed" | "error"
-  ...postsAdapter.getInitialState(),
-  error: null,
+  ids: [],
+  entities: {},
 };
+
+/**
+ * ACTION TYPE
+ */
+const FETCH_POSTS_PENDING = "posts/FETCH_POSTS_PENDING";
+const FETCH_POSTS_SUCCEED = "posts/FETCH_POSTS_SUCCEED";
+
+/**
+ * ACTION CREATOR
+ */
+const fetchPostsPending = () => ({
+  type: FETCH_POSTS_PENDING,
+});
+
+const fetchPostsSucceed = (posts) => ({
+  type: FETCH_POSTS_SUCCEED,
+  payload: posts,
+});
 
 /**
  * THUNKS
  */
-export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
+export const fetchPosts = () => async (dispatch) => {
+  dispatch(fetchPostsPending());
+
   const response = await fetch("http://jsonplaceholder.typicode.com/posts");
   const posts = await response.json();
 
   await wait();
 
-  return posts;
-});
+  dispatch(fetchPostsSucceed(posts));
+};
 
 /**
  * REDUCER
  */
-export const reducer = createReducer(initialState, (builder) => {
-  builder.addCase(fetchPosts.pending.type, (state) => {
-    state.status = "pending";
-  });
+export const reducer = (state = initialState, action) => {
+  switch (action.type) {
+    case FETCH_POSTS_PENDING: {
+      return { ...state, status: "pending" };
+    }
 
-  builder.addCase(fetchPosts.fulfilled.type, (state, action) => {
-    postsAdapter.addMany(state, action.payload);
+    case FETCH_POSTS_SUCCEED: {
+      const postsIds = action.payload.map((post) => post.id);
+      const postsEntities = action.payload.reduce(
+        (acc, post) => ({ ...acc, [post.id]: post }),
+        {}
+      );
 
-    state.status = "succeed";
-  });
+      return {
+        ...state,
+        status: "succeed",
+        ids: postsIds,
+        entities: postsEntities,
+      };
+    }
 
-  builder.addCase(fetchPosts.rejected.type, (state, action) => {
-    state.status = "error";
-    state.error = action.error;
-  });
-});
+    default: {
+      return state;
+    }
+  }
+};
 
 /**
  * SELECTORS
