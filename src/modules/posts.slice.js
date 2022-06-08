@@ -1,4 +1,3 @@
-import { serializeError } from "serialize-error";
 import { wait } from "../utils";
 
 /**
@@ -8,7 +7,6 @@ const initialState = {
   status: "idle", // "idle" | "pending" | "succeed" | "error"
   ids: [],
   entities: {},
-  error: null,
 };
 
 /**
@@ -16,7 +14,6 @@ const initialState = {
  */
 const FETCH_POSTS_PENDING = "posts/FETCH_POSTS_PENDING";
 const FETCH_POSTS_SUCCEED = "posts/FETCH_POSTS_SUCCEED";
-const FETCH_POSTS_ERROR = "posts/FETCH_POSTS_ERROR";
 
 /**
  * ACTION CREATOR
@@ -30,27 +27,18 @@ const fetchPostsSucceed = (posts) => ({
   payload: posts,
 });
 
-const fetchPostsError = (error) => ({
-  type: FETCH_POSTS_ERROR,
-  error: serializeError(error),
-});
-
 /**
  * THUNKS
  */
 export const fetchPosts = () => async (dispatch) => {
   dispatch(fetchPostsPending());
 
-  try {
-    const response = await fetch("http://jsonplaceholder.typicode.com/posts");
-    const posts = await response.json();
+  const response = await fetch("http://jsonplaceholder.typicode.com/posts");
+  const posts = await response.json();
 
-    await wait();
+  await wait();
 
-    dispatch(fetchPostsSucceed(posts));
-  } catch (error) {
-    dispatch(fetchPostsError(error));
-  }
+  dispatch(fetchPostsSucceed(posts));
 };
 
 /**
@@ -75,10 +63,6 @@ export const reducer = (state = initialState, action) => {
         ids: postsIds,
         entities: postsEntities,
       };
-    }
-
-    case FETCH_POSTS_ERROR: {
-      return { ...state, status: "error", error: action.error };
     }
 
     default: {
