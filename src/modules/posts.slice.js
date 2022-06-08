@@ -1,75 +1,48 @@
+import {
+  createAsyncThunk,
+  createEntityAdapter,
+  createReducer,
+} from "@reduxjs/toolkit";
 import { wait } from "../utils";
+
+const postsAdapter = createEntityAdapter();
 
 /**
  * INITIAL STATE
  */
 const initialState = {
   status: "idle", // "idle" | "pending" | "succeed" | "error"
-  ids: [],
-  entities: {},
+  ...postsAdapter.getInitialState(),
 };
-
-/**
- * ACTION TYPE
- */
-const FETCH_POSTS_PENDING = "posts/FETCH_POSTS_PENDING";
-const FETCH_POSTS_SUCCEED = "posts/FETCH_POSTS_SUCCEED";
-
-/**
- * ACTION CREATOR
- */
-const fetchPostsPending = () => ({
-  type: FETCH_POSTS_PENDING,
-});
-
-const fetchPostsSucceed = (posts) => ({
-  type: FETCH_POSTS_SUCCEED,
-  payload: posts,
-});
 
 /**
  * THUNKS
  */
-export const fetchPosts = () => async (dispatch) => {
-  dispatch(fetchPostsPending());
+export const fetchPosts = createAsyncThunk(
+  "fetchPosts",
+  async (_arg, thunkAPI) => {
+    const response = await fetch("http://jsonplaceholder.typicode.com/posts");
+    const posts = await response.json();
 
-  const response = await fetch("http://jsonplaceholder.typicode.com/posts");
-  const posts = await response.json();
+    await wait();
 
-  await wait();
-
-  dispatch(fetchPostsSucceed(posts));
-};
+    return posts;
+  }
+);
 
 /**
  * REDUCER
  */
-export const reducer = (state = initialState, action) => {
-  switch (action.type) {
-    case FETCH_POSTS_PENDING: {
-      return { ...state, status: "pending" };
-    }
+export const reducer = createReducer(initialState, (builder) => {
+  builder.addCase(fetchPosts.pending.type, (state) => {
+    state.status = "pending";
+  });
 
-    case FETCH_POSTS_SUCCEED: {
-      const postsIds = action.payload.map((post) => post.id);
-      const postsEntities = action.payload.reduce(
-        (acc, post) => ({ ...acc, [post.id]: post }),
-        {}
-      );
-
-      return {
-        ...state,
-        status: "succeed",
-        ids: postsIds,
-        entities: postsEntities,
-      };
-    }
-
-    default: {
-      return state;
-    }
-  }
-};
+  builder.addCase(fetchPosts.fulfilled.type, (state, action) => {
+    state.status = "succeed";
+    postsAdapter.addMany(state, action.payload);
+  });
+});
 
 /**
  * SELECTORS
