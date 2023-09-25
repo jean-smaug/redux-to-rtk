@@ -4,7 +4,7 @@ import { wait } from "../utils";
  * INITIAL STATE
  */
 const initialState = {
-  status: "idle", // "idle" | "pending" | "succeed" | "error"
+  status: "idle", // "idle" | "pending" | "fulfilled" | "error"
   ids: [],
   entities: {},
 };
@@ -13,7 +13,7 @@ const initialState = {
  * ACTION TYPE
  */
 const FETCH_POSTS_PENDING = "posts/FETCH_POSTS_PENDING";
-const FETCH_POSTS_SUCCEED = "posts/FETCH_POSTS_SUCCEED";
+const FETCH_POSTS_FULFILLED = "posts/FETCH_POSTS_FULFILLED";
 
 /**
  * ACTION CREATOR
@@ -22,8 +22,8 @@ const fetchPostsPending = () => ({
   type: FETCH_POSTS_PENDING,
 });
 
-const fetchPostsSucceed = (posts) => ({
-  type: FETCH_POSTS_SUCCEED,
+const fetchPostsFulfilled = (posts) => ({
+  type: FETCH_POSTS_FULFILLED,
   payload: posts,
 });
 
@@ -38,7 +38,7 @@ export const fetchPosts = () => async (dispatch) => {
 
   await wait();
 
-  dispatch(fetchPostsSucceed(posts));
+  dispatch(fetchPostsFulfilled(posts));
 };
 
 /**
@@ -50,7 +50,7 @@ export const reducer = (state = initialState, action) => {
       return { ...state, status: "pending" };
     }
 
-    case FETCH_POSTS_SUCCEED: {
+    case FETCH_POSTS_FULFILLED: {
       const postsIds = action.payload.map((post) => post.id);
       const postsEntities = action.payload.reduce(
         (acc, post) => ({ ...acc, [post.id]: post }),
@@ -59,7 +59,7 @@ export const reducer = (state = initialState, action) => {
 
       return {
         ...state,
-        status: "succeed",
+        status: "fulfilled",
         ids: postsIds,
         entities: postsEntities,
       };
