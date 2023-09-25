@@ -10,7 +10,8 @@ theme: uncover
 ## Whoami
 
 - Maxime Blanc
-- Tech lead at **@Bedrock**
+- Tech lead at **@Bedrock_Stream**
+- Building **@\_progressively**
 - **@jean-smaug**
 - https://maximeblanc.fr
 
