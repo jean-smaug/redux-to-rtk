@@ -3,14 +3,14 @@ marp: true
 theme: uncover
 ---
 
-# Migration progressive vers Redux Toolkit
+# Redux Toolkit : the step by step migration
 
 ---
 
 ## Whoami
 
 - Maxime Blanc
-- Tech lead dans les équipes TVJS
+- Tech lead at **@Bedrock**
 - **@jean-smaug**
 - https://maximeblanc.fr
 
@@ -18,17 +18,17 @@ theme: uncover
 
 ## Redux, c'est quoi ?
 
-- Une librairie JS
-- Créée par **Dan Abramov** et **Andrew Clark**.
-- Maintenue par **Mark Erikson** et **Tim Dorr**.
-- Inspirée par **Flux**, **Elm**, **Immutable**...
-- Gestionnaire d'état global
+- A JS library
+- Global state manager
+- Created by **Dan Abramov** and **Andrew Clark**.
+- Maintained by **Mark Erikson** and **Tim Dorr**.
+- Inspired by **Flux**, **Elm**, **Immutable**...
 
 Source : Wikipedia
 
 ---
 
-## Notions Redux
+## Redux's concepts
 
 - Action
 - Action Creator
@@ -39,29 +39,29 @@ Source : Wikipedia
 
 ## Action
 
-Un objet avec un `type`
+An objet with a `type` key
 
 ```js
-const monAction = {
+const myAction = {
   type: "users/FETCH_SUCCESS",
 };
 ```
 
 ---
 
-## Convention pour les actions
+## Convention for actions
 
 ```js
-const monAction = {
+const myActionWithPayload = {
   type: "users/FETCH_SUCCESS",
-  payload: [{ name: "Jeansmaug", age: 25 }],
+  payload: [{ name: "Jeansmaug", age: 27 }],
 };
 ```
 
 ```js
-const monAction = {
+const myActionWithError = {
   type: "users/FETCH_SUCCESS",
-  error: { name: "Erreur", message: "Nimporte quoi" },
+  error: { name: "Error", message: "Couldn't reach the API" },
 };
 ```
 
@@ -69,12 +69,12 @@ const monAction = {
 
 ## Action creator
 
-Une fonction qui retourne une action
+A function that returns an action
 
 ```js
 const actionCreator = () => {
   return {
-    type: "users/FETCH_PENDING",
+    type: "users/FETCH_SUCCESS",
   };
 };
 ```
@@ -83,7 +83,7 @@ const actionCreator = () => {
 
 ## Dispatcher
 
-La seule façon de mettre à jour le store Redux et de dispatcher une action
+A method which is **the only way** to update the store.
 
 ```js
 import { createStore } from "redux";
@@ -91,7 +91,7 @@ import { createStore } from "redux";
 const store = createStore();
 
 store.dispatch({
-  type: "foo/BAR",
+  type: "users/FETCH_SUCCESS",
 });
 store.dispatch(actionCreator());
 ```
@@ -120,7 +120,7 @@ const reducer = (state = initialState, action) => {
 
 ---
 
-## Synthèse
+## Synthesis
 
 ![h:550](./images/c90d2a4a-c5d4-48f7-a96f-e8352a638722_redux%20workflow2.png)
 
@@ -132,7 +132,7 @@ RTK = Redux + Stéroïdes
 
 ---
 
-## C'est l'heure de la démo
+## It's demo time!
 
 ---
 
