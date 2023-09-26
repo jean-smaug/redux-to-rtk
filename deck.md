@@ -17,7 +17,7 @@ theme: uncover
 
 ---
 
-## Redux, c'est quoi ?
+## What is Redux ?
 
 - A JS library
 - Global state manager
@@ -31,10 +31,23 @@ Source : Wikipedia
 
 ## Redux's concepts
 
+- State
 - Action
 - Action Creator
 - Dispatcher
 - Reducer
+
+---
+
+## State
+
+![h:600](./images/redux-state.png)
+
+---
+
+## Global view
+
+![h:550](./images/c90d2a4a-c5d4-48f7-a96f-e8352a638722_redux%20workflow2.png)
 
 ---
 
@@ -50,7 +63,9 @@ const myAction = {
 
 ---
 
-## Convention for actions
+## Conventions for actions
+
+`payload` key for extra data
 
 ```js
 const myActionWithPayload = {
@@ -58,6 +73,8 @@ const myActionWithPayload = {
   payload: [{ name: "Jeansmaug", age: 27 }],
 };
 ```
+
+`error` key for... 🥁 errors
 
 ```js
 const myActionWithError = {
@@ -76,6 +93,13 @@ A function that returns an action
 const actionCreator = () => {
   return {
     type: "users/FETCH_SUCCESS",
+  };
+};
+
+const actionCreatorWithParam = (users) => {
+  return {
+    type: "users/FETCH_SUCCESS",
+    payload: users,
   };
 };
 ```
@@ -101,7 +125,7 @@ store.dispatch(actionCreator());
 
 ## Reducer
 
-Fonction pure qui à partir d'un état initial retourne un nouvel état
+Pure function that listen for actions and return a new state
 
 ```js
 const initialState = {
@@ -129,7 +153,7 @@ const reducer = (state = initialState, action) => {
 
 ## Redux Toolkit (RTK)
 
-RTK = Redux + Stéroïdes
+RTK = Redux + Steroid (don't do drugs 🙏)
 
 ---
 
@@ -137,16 +161,16 @@ RTK = Redux + Stéroïdes
 
 ---
 
-## REX perso sur RTK
+## Personnal feedback on RTK
 
-- RTK facilite l'**usage** de Redux
-- N'est pas un **outil** miracle
-- Abstrait la complexité
-- Mieux architecturer son store
-- Suivre les bonnes pratiques
+- Makes **usage** easier
+- It's **not a magic tool** that will solve everything
+- Add a level of abstraction
+- Helps in store architecture
+- Facilitate good practices
 
 ---
 
-## Des questions ?
+## Any questions ?
 
-(si je n'ai pas dépassé le temps imparti)
+(if we have time 😇)
