@@ -47,7 +47,10 @@ export const fetchPosts = () => async (dispatch) => {
 export const reducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_POSTS_PENDING: {
-      return { ...state, status: "pending" };
+      // return { ...state, status: "pending" };
+      state.status = "pending";
+
+      return state;
     }
 
     case FETCH_POSTS_FULFILLED: {
