@@ -125,7 +125,7 @@ store.dispatch(actionCreator());
 
 ## Reducer
 
-Pure function that listen for actions and return a new state
+A pure function that listens for actions and produces a new state
 
 ```js
 const initialState = {
@@ -163,11 +163,11 @@ RTK = Redux + Steroid (don't do drugs 🙏)
 
 ## Personnal feedback on RTK
 
-- Makes **usage** easier
-- It's **not a magic tool** that will solve everything
-- Add a level of abstraction
-- Helps in store architecture
-- Facilitate good practices
+1. **Simplifies usage**.
+1. It's **not a magical tool** that can solve everything.
+1. Introduces an additional layer of abstraction.
+1. Aids in structuring store architecture.
+1. Promotes good practices.
 
 ---
 
