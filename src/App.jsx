@@ -15,8 +15,9 @@ function App() {
   }
 
   return (
-    <div>
+    <div style={{ display: "flex", flexDirection: "column" }}>
       <button
+        style={{ width: "80%", margin: "auto", marginTop: "10px" }}
         onClick={() => {
           // TODO: implement prevent refetch
           dispatch(fetchPosts());
@@ -25,7 +26,11 @@ function App() {
         Click me
       </button>
 
-      {status === "pending" ? "Chargement..." : <PostList />}
+      {status === "pending" ? (
+        <div style={{ margin: "auto", marginTop: "10px" }}>Loading...</div>
+      ) : (
+        <PostList />
+      )}
     </div>
   );
 }
